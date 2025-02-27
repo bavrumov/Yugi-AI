@@ -5,6 +5,7 @@ import { APP_NAME, APP_DESCRIPTION } from "@/lib/constants";
 import MillenniumBackground from "@/components/MillenniumBackground";
 import ThemeToggle from "@/components/ThemeToggle";
 import ThemeProviderWrapper from "@/components/ThemeProviderWrapper"; // Import the client-side ThemeProvider
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </main>
         </ThemeProviderWrapper>
+        <Analytics />
       </body>
     </html>
   );
