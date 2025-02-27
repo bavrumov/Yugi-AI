@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from 'react';
-import { Filter } from 'bad-words'; // Importing profanity filter
+import { Filter } from 'bad-words';
 
 interface QueryFormProps {
   onSubmit: (query: string) => void;
@@ -8,11 +8,13 @@ interface QueryFormProps {
 }
 
 const MAX_CHAR_LIMIT = 250;
-const filter = new Filter(); // Create a filter instance
+const RATE_LIMIT_MS = 5000; // 5 second cooldown between submissions
+const filter = new Filter(); //  Profanity filter
 
 export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: QueryFormProps) {
   const [query, setQuery] = useState(initialQuery);
   const [error, setError] = useState<string | null>(null);
+  const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
 
   const sanitizeInput = (input: string) => {
     return input
@@ -21,7 +23,7 @@ export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: Qu
   };
 
   const containsProfanity = (input: string) => {
-    return filter.isProfane(input); // Check for profanity
+    return filter.isProfane(input);
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -41,6 +43,13 @@ export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: Qu
       return;
     }
 
+    const now = Date.now();
+    if (now - lastSubmitTime < RATE_LIMIT_MS) {
+      setError(`Please wait ${Math.ceil((RATE_LIMIT_MS - (now - lastSubmitTime)) / 1000)}s before submitting again.`);
+      return;
+    }
+
+    setLastSubmitTime(now);
     setError(null);
     onSubmit(sanitizedQuery);
   };
