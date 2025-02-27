@@ -11,6 +11,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: APP_NAME,
   description: APP_DESCRIPTION,
+  icons: {
+    icon: "/images/millennium-items/puzzle.png", // Default favicon
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
