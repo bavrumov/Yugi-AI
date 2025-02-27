@@ -52,10 +52,11 @@ export default function JudgePage() {
   };
   
   useEffect(() => {
-    if (queryParam) {
-      fetchRuling(queryParam);
-    }
-  }, []);
+    if (!queryParam || isLoading) return; // Prevent duplicate calls when already loading
+    setQuery(queryParam);
+    fetchRuling(queryParam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryParam]);
   
   return (
     <>

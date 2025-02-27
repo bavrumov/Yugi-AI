@@ -15,15 +15,15 @@ export default function AnimatedResponse({ response, speed = 400 }: AnimatedResp
       return;
     }
     
-    setIsTyping(true);
-    setDisplayText('');
-    
     const characters = response.split('');
-    let currentIndex = -1; // Start at -1 to ensure the first character is added immediately, 0 skips first char
     
     // Calculate interval based on desired character per second rate
     const interval = 1000 / speed;
-    
+    let currentIndex = 0;
+
+    setIsTyping(true);
+    setDisplayText(characters[currentIndex]); // Start with the first character immediately
+
     const timer = setInterval(() => {
       if (currentIndex < characters.length - 1) { // len - 1 is used so it doesn't print undefined at the end
         setDisplayText((prev) => prev + characters[currentIndex]);

@@ -21,7 +21,7 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
       messages: [{ role: "user", content: query }]
     });
   } 
-  // Format for Google Gemini models
+  // Format for Google Gemini models, UNUSED
   else if (modelId.includes("google.gemini")) {
     return JSON.stringify({
       contents: [
@@ -34,7 +34,7 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
       }
     });
   }
-  // Format for DeepSeek models
+  // Format for DeepSeek models, UNUSED
   else if (modelId.includes("deepseek")) {
     return JSON.stringify({
       messages: [

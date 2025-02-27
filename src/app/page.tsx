@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { APP_NAME } from '@/lib/constants';
 import QueryForm from '@/components/QueryForm';
-import AnimatedResponse from '@/components/AnimatedResponse';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -47,6 +46,11 @@ export default function Home() {
           <h2 className="text-2xl font-semibold mb-4">Examples</h2>
           <ul className="space-y-2 text-blue-600 dark:text-blue-400">
             <li>
+              <Link href="/judge?q=How do I pendulum summon?">
+                How do I pendulum summon?
+              </Link>
+            </li>
+            <li>
               <Link href="/judge?q=Ash Blossom vs Called by the Grave timing">
                 Ash Blossom vs Called by the Grave timing
               </Link>
@@ -57,13 +61,8 @@ export default function Home() {
               </Link>
             </li>
             <li>
-              <Link href="/judge?q=How does Mystic Mine work with link monsters?">
-                How does Mystic Mine work with link monsters?
-              </Link>
-            </li>
-            <li>
-              <Link href="/judge?q=How do I pendulum summon?">
-                How do I pendulum summon?
+              <Link href="/judge?q=Does Mirrorjade's destruction effect trigger when Traptrix Pudica's effect banishes it from the field?">
+                Does Mirrorjade's destruction effect trigger when Traptrix Pudica's effect banishes it from the field?
               </Link>
             </li>
           </ul>
