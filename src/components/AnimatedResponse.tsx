@@ -5,7 +5,7 @@ interface AnimatedResponseProps {
   speed?: number; // Characters per second
 }
 
-export default function AnimatedResponse({ response, speed = 200 }: AnimatedResponseProps) {
+export default function AnimatedResponse({ response, speed = 400 }: AnimatedResponseProps) {
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   
