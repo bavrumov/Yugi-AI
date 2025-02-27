@@ -36,7 +36,7 @@ A lightweight application that provides instant and accurate Yu-Gi-Oh! Trading C
    AWS_REGION=us-east-1
    AWS_ACCESS_KEY_ID=your-access-key-id
    AWS_SECRET_ACCESS_KEY=your-secret-access-key
-   AI_MODEL=anthropic.claude-3-sonnet-20240229
+   AI_MODEL=us.anthropic.claude-3-7-sonnet-20250219-v1:0
    ```
 
 4. Start the development server:
@@ -47,8 +47,12 @@ A lightweight application that provides instant and accurate Yu-Gi-Oh! Trading C
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Deployment
-
-See the included AWS Setup Guide for detailed deployment instructions.
+   ```bash
+   npm run build
+   npm start
+   ```
+   
+See the included [AWS Setup Guide](./AWSSetupGuide.md) for detailed deployment instructions.
 
 ## Technology Stack
 
