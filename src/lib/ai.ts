@@ -89,8 +89,7 @@ export async function getJudgeRuling(query: string): Promise<string> {
     return extractResponseText(modelId, responseBody);
   } catch (error) {
     console.error("Error getting ruling:", error);
-    //todo: why does this ignore the first letter?
-    return "_Sorry, I couldn't process your request. Please try again.";
+    return "Sorry, I couldn't process your request. Please try again.";
   }
 
 }

@@ -61,6 +61,11 @@ export default function Home() {
                 How does Mystic Mine work with link monsters?
               </Link>
             </li>
+            <li>
+              <Link href="/judge?q=How do I pendulum summon?">
+                How do I pendulum summon?
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

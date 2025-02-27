@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // const response = await getJudgeRuling(query);
-    const response = await getDummyJudgeRuling(query);
+    const response = await getJudgeRuling(query);
+    // const response = await getDummyJudgeRuling(query);
     return NextResponse.json({ response });
   } catch (error) {
     console.error('Error processing request:', error);
