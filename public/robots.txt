@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /judge
+
+Sitemap: https://yugiai.com/sitemap.xml

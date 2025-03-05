@@ -20,6 +20,27 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="description" content={APP_DESCRIPTION} />
+        <meta name="keywords" content="Yu-Gi-Oh!, TCG, rulings, card game, judge, FAQ" />
+        <meta name="author" content="Your Name" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Can Ash Blossom negate Droll & Lock Bird?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No, Droll & Lock Bird does not activate an effect that 'adds a card' from Deck to Hand, so Ash Blossom cannot negate it."
+                }
+              }
+            ]
+          })}
+        </script>
+      </head>
       <body className={`${inter.className} bg-gray-50 dark:bg-gray-900 min-h-screen`}>
         <ThemeProviderWrapper>
           <MillenniumBackground />
