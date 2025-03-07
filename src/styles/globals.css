@@ -17,14 +17,24 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  transition: color 0.3s ease, background 0.3s ease;
 }
 
 html.light h1, html.light h2 {
   color: #000; /* Light theme text color */
+  transition: color 0.3s ease;
 }
   
 html.dark h1, html.dark h2 {
   color: #fff; /* Dark theme text color */
+  transition: color 0.3s ease;
+}
+
+/* Add transition to all elements that might change with theme */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: ease;
+  transition-duration: 0.3s;
 }
 
 @keyframes fadeIn {
