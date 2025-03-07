@@ -98,6 +98,5 @@ export async function getJudgeRuling(query: string): Promise<string> {
 export async function getDummyJudgeRuling(query: string): Promise<string> {
     const modelId = process.env.AI_MODEL || "anthropic.claude-3-sonnet-20240229";
     const payload = prepareModelPayload(modelId, JUDGE_SYSTEM_PROMPT, query);
-    console.log("Dummy payload:", payload);
     return payload
 }

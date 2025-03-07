@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getJudgeRuling } from '@/lib/ai';
+import { getDummyJudgeRuling, getJudgeRuling } from '@/lib/ai';
 
 export async function POST(request: NextRequest) {
   try {
