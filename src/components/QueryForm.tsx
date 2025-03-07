@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import { Filter } from 'bad-words';
 
 interface QueryFormProps {
@@ -15,6 +15,11 @@ export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: Qu
   const [query, setQuery] = useState(initialQuery);
   const [error, setError] = useState<string | null>(null);
   const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
+
+  // Update query state when initialQuery prop changes
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   const sanitizeInput = (input: string) => {
     return input
