@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, ReactNode } from 'react';
 import { Filter } from 'bad-words';
 
 interface QueryFormProps {
@@ -9,11 +9,11 @@ interface QueryFormProps {
 
 const MAX_CHAR_LIMIT = 250;
 const RATE_LIMIT_MS = 5000; // 5 second cooldown between submissions
-const filter = new Filter(); //  Profanity filter
+const filter = new Filter(); // Profanity filter
 
 export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: QueryFormProps) {
   const [query, setQuery] = useState(initialQuery);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | ReactNode | null>(null);
   const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
 
   // Update query state when initialQuery prop changes
@@ -44,7 +44,18 @@ export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: Qu
       return;
     }
     if (containsProfanity(sanitizedQuery)) {
-      setError('Inappropriate language is not allowed.');
+      setError(
+        <>Inappropriate language is{' '}
+          <a
+            href="https://youtube.com/shorts/R9dhR8dnC2I?si=WOLxnGe4KiJzZE34"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline cursor-pointer text-blue-500 hover:text-blue-700"
+          >
+            not allowed
+          </a>.
+        </>
+      );
       return;
     }
 
