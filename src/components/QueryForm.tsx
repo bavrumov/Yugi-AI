@@ -8,7 +8,7 @@ interface QueryFormProps {
 }
 
 const MAX_CHAR_LIMIT = 250;
-const RATE_LIMIT_MS = 5000; // 5 second cooldown between submissions
+const RATE_LIMIT_MS = process.env.ENV === 'DEV' ? 0 : 5000; // 5 second cooldown between submissions in prod, 0 in dev
 const filter = new Filter(); // Profanity filter
 
 export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: QueryFormProps) {
