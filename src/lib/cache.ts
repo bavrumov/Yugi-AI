@@ -1,3 +1,5 @@
+import { ASH_RESPONSE, MIRRORJADE_RESPONSE, PENDULUM_RESPONSE, SOLEMN_RESPONSE } from "./constants";
+
 interface CachedResponse {
   query: string;  // Original query with punctuation
   normalizedQuery: string;  // Lowercase, no punctuation
@@ -44,18 +46,18 @@ class ResponseCache {
 export const responseCache = new ResponseCache([
   {
     query: "How do I pendulum summon?",
-    response: "<update_me1>"
+    response: PENDULUM_RESPONSE
   },
   {
     query: "Ash Blossom vs Called by the Grave timing",
-    response: "<update_me2>"
+    response: ASH_RESPONSE
   },
   {
     query: "Can I chain Solemn Strike to a monster effect?",
-    response: "<update_me3>"
+    response: SOLEMN_RESPONSE
   },
   {
     query: "Does Mirrorjade's destruction effect trigger when Traptrix Pudica's effect banishes it from the field?",
-    response: "<update_me4>"
+    response: MIRRORJADE_RESPONSE
   }
 ]);
