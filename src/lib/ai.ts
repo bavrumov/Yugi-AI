@@ -1,5 +1,7 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
-import { JUDGE_SYSTEM_PROMPT } from "./constants";
+import { JUDGE_SYSTEM_PROMPT_v1, ASH_RESPONSE, MIRRORJADE_RESPONSE, SOLEMN_RESPONSE, PENDULUM_RESPONSE } from "./constants";
+
+export const JUDGE_SYSTEM_PROMPT = JUDGE_SYSTEM_PROMPT_v1;
 
 // Initialize the AWS Bedrock client
 const bedrockClient = new BedrockRuntimeClient({
@@ -17,6 +19,8 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
     return JSON.stringify({
       anthropic_version: "bedrock-2023-05-31",
       max_tokens: 1000,
+      temperature: 0.1, // Add this line to lower output randomness and increase correctness, perfect for /judge
+      top_p: 0.9,
       system: systemPrompt,
       messages: [{ role: "user", content: query }]
     });
@@ -94,9 +98,23 @@ export async function getJudgeRuling(query: string): Promise<string> {
 
 }
 
-// Dummy endpoint, just dumps the request
+// Dummy endpoint, just dumps the request or returns a constant response
 export async function getDummyJudgeRuling(query: string): Promise<string> {
     const modelId = process.env.AI_MODEL || "anthropic.claude-3-sonnet-20240229";
+    // Four cases for the four default questions, which will response with the four constant responses
+    if (query === "How do I pendulum summon?") {
+      return PENDULUM_RESPONSE;
+    }
+    if (query === "Ash Blossom vs Called by the Grave timing") {
+      return ASH_RESPONSE;
+    }
+    if (query === "Can I chain Solemn Strike to a monster effect?") {
+      return SOLEMN_RESPONSE;
+    }
+    if (query === "Does Mirrorjade's destruction effect trigger when Traptrix Pudica's effect banishes it from the field?") {
+      return MIRRORJADE_RESPONSE;
+    }
+    // Otherwise, just return the query
     const payload = prepareModelPayload(modelId, JUDGE_SYSTEM_PROMPT, query);
-    return payload
+    return payload;
 }
