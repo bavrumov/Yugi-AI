@@ -12,7 +12,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const response = await getJudgeRuling(query);
+    // Ternary operator to switch between dummy and real model
+    const response = process.env.ENV === "DEV" ? await getDummyJudgeRuling(query) : await getJudgeRuling(query);
 
     return NextResponse.json({ response });
   } catch (error) {
