@@ -71,8 +71,31 @@ const extractResponseText = (modelId: string, responseBody: any) => {
   }
 };
 
+// Four cases for the four default questions, which will respond with the four constant responses
+const getConstantResponse = (query: string): string => {
+  if (query === "How do I pendulum summon?") {
+    return PENDULUM_RESPONSE;
+  }
+  if (query === "Ash Blossom vs Called by the Grave timing") {
+    return ASH_RESPONSE;
+  }
+  if (query === "Can I chain Solemn Strike to a monster effect?") {
+    return SOLEMN_RESPONSE;
+  }
+  if (query === "Does Mirrorjade's destruction effect trigger when Traptrix Pudica's effect banishes it from the field?") {
+    return MIRRORJADE_RESPONSE;
+  }
+  return "";
+};
+
 // Get ruling from AI model
 export async function getJudgeRuling(query: string): Promise<string> {
+  // Check if the query matches one of the four default
+  const constantResponse = getConstantResponse(query);
+  if (constantResponse) {
+      return constantResponse;
+  }
+  // Otherwise, get the ruling from the model
   try {
     const modelId = process.env.AI_MODEL || "anthropic.claude-3-sonnet-20240229";
     
@@ -100,21 +123,13 @@ export async function getJudgeRuling(query: string): Promise<string> {
 
 // Dummy endpoint, just dumps the request or returns a constant response
 export async function getDummyJudgeRuling(query: string): Promise<string> {
-    const modelId = process.env.AI_MODEL || "anthropic.claude-3-sonnet-20240229";
-    // Four cases for the four default questions, which will response with the four constant responses
-    if (query === "How do I pendulum summon?") {
-      return PENDULUM_RESPONSE;
-    }
-    if (query === "Ash Blossom vs Called by the Grave timing") {
-      return ASH_RESPONSE;
-    }
-    if (query === "Can I chain Solemn Strike to a monster effect?") {
-      return SOLEMN_RESPONSE;
-    }
-    if (query === "Does Mirrorjade's destruction effect trigger when Traptrix Pudica's effect banishes it from the field?") {
-      return MIRRORJADE_RESPONSE;
-    }
-    // Otherwise, just return the query
-    const payload = prepareModelPayload(modelId, JUDGE_SYSTEM_PROMPT, query);
-    return payload;
+  // Check if the query matches one of the four default
+  const constantResponse = getConstantResponse(query);
+  if (constantResponse) {
+    return constantResponse;
+  }
+  const modelId = process.env.AI_MODEL || "anthropic.claude-3-sonnet-20240229";
+  // Otherwise, just return the query
+  const payload = prepareModelPayload(modelId, JUDGE_SYSTEM_PROMPT, query);
+  return payload;
 }
