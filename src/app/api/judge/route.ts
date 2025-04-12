@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDummyJudgeRuling, getJudgeRuling } from '@/lib/ai';
+import { isProdEnv } from '@/lib/util';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,8 +13,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Ternary operator to switch between dummy and real model
-    const response = process.env.ENV === "DEV" ? await getDummyJudgeRuling(query) : await getJudgeRuling(query);
+    // Use the dummy endpoint for local development and testing
+    const response = isProdEnv() ? await getJudgeRuling(query) : await getDummyJudgeRuling(query);
 
     return NextResponse.json({ response });
   } catch (error) {

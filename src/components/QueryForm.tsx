@@ -1,5 +1,5 @@
 import React, { useState, FormEvent, useEffect } from 'react';
-import { Filter } from 'bad-words';
+import { containsProfanity, isProdEnv, sanitizeInput } from '@/lib/util';
 
 interface QueryFormProps {
   onSubmit: (query: string) => void;
@@ -8,8 +8,7 @@ interface QueryFormProps {
 }
 
 const MAX_CHAR_LIMIT = 250;
-const RATE_LIMIT_MS = process.env.ENV === 'DEV' ? 0 : 5000; // 5 second cooldown between submissions in prod, 0 in dev
-const filter = new Filter(); //  Profanity filter
+const RATE_LIMIT_MS = isProdEnv() ? 5000 : 0; // 5 second cooldown between submissions in prod, 0 in dev
 
 export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: QueryFormProps) {
   const [query, setQuery] = useState(initialQuery);
@@ -20,16 +19,6 @@ export default function QueryForm({ onSubmit, isLoading, initialQuery = '' }: Qu
   useEffect(() => {
     setQuery(initialQuery);
   }, [initialQuery]);
-
-  const sanitizeInput = (input: string) => {
-    return input
-      .replace(/[<>;"']/g, '') // Remove potentially harmful characters
-      .trim();
-  };
-
-  const containsProfanity = (input: string) => {
-    return filter.isProfane(input);
-  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

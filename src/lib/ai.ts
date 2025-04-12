@@ -1,7 +1,15 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
-import { JUDGE_SYSTEM_PROMPT_v1, ASH_RESPONSE, MIRRORJADE_RESPONSE, SOLEMN_RESPONSE, PENDULUM_RESPONSE } from "./constants";
+import {
+  ASH_RESPONSE,
+  DEFAULT_CLAUDE_MODEL,
+  JUDGE_SYSTEM_PROMPT_v1,
+  JUDGE_SYSTEM_PROMPT_v1_CHAIN_OF_THOUGHT,
+  MIRRORJADE_RESPONSE,
+  PENDULUM_RESPONSE,
+  SOLEMN_RESPONSE,
+} from "./constants";
 
-export const JUDGE_SYSTEM_PROMPT = JUDGE_SYSTEM_PROMPT_v1;
+export const JUDGE_SYSTEM_PROMPT = JUDGE_SYSTEM_PROMPT_v1_CHAIN_OF_THOUGHT;
 
 // Initialize the AWS Bedrock client
 const bedrockClient = new BedrockRuntimeClient({
@@ -24,7 +32,18 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
       system: systemPrompt,
       messages: [{ role: "user", content: query }]
     });
-  } 
+  }
+  // Format for DeepSeek models
+  else if (modelId.includes("deepseek")) {
+    return JSON.stringify({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: query }
+      ],
+      max_tokens: 1000,
+      temperature: 0.1 // Lowers output randomness and increase correctness, perfect for /judge
+    });
+  }
   // Format for Google Gemini models, UNUSED
   else if (modelId.includes("google.gemini")) {
     return JSON.stringify({
@@ -36,17 +55,6 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
         max_output_tokens: 1000,
         temperature: 0.2
       }
-    });
-  }
-  // Format for DeepSeek models, UNUSED
-  else if (modelId.includes("deepseek")) {
-    return JSON.stringify({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: query }
-      ],
-      max_tokens: 1000,
-      temperature: 0.2
     });
   }
   
@@ -97,12 +105,11 @@ export async function getJudgeRuling(query: string): Promise<string> {
   }
   // Otherwise, get the ruling from the model
   try {
-    const modelId = process.env.AI_MODEL || "anthropic.claude-3-sonnet-20240229";
-    
+    const modelId = process.env.AI_MODEL || DEFAULT_CLAUDE_MODEL;
     const payload = prepareModelPayload(modelId, JUDGE_SYSTEM_PROMPT, query);
-    
+
     const command = new InvokeModelCommand({
-      modelId,
+      modelId: modelId,
       contentType: "application/json",
       accept: "application/json",
       body: payload
@@ -128,7 +135,7 @@ export async function getDummyJudgeRuling(query: string): Promise<string> {
   if (constantResponse) {
     return constantResponse;
   }
-  const modelId = process.env.AI_MODEL || "anthropic.claude-3-sonnet-20240229";
+  const modelId = process.env.AI_MODEL || DEFAULT_CLAUDE_MODEL;
   // Otherwise, just return the query
   const payload = prepareModelPayload(modelId, JUDGE_SYSTEM_PROMPT, query);
   return payload;
