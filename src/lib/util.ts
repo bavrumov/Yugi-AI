@@ -1,5 +1,8 @@
 import { Filter } from "bad-words";
-import { YGO_SAFE_TERMS } from "./constants";
+import { DEFAULT_CLAUDE_MODEL, YGO_SAFE_TERMS } from "./constants";
+
+// Model type constants initialized from environment variables
+const CURRENT_MODEL = process.env.AI_MODEL || DEFAULT_CLAUDE_MODEL;
 
 const ENV = {
     PROD: "PROD",
@@ -13,7 +16,8 @@ export const sanitizeInput = (input: string) => {
         .trim();
 };
 
-const filter = new Filter(); //  Profanity filter
+//  Profanity filter and helper method
+const filter = new Filter(); 
 
 export const containsProfanity = (input: string): boolean => {
     const words = input.toLowerCase().split(/\s+/);
@@ -29,4 +33,17 @@ export const isProdEnv = () => {
 
 export const isDevEnv = () => {
     return process.env.ENV === ENV.DEV
+};
+
+// Model type utility functions
+export const isClaudeModel = () => {
+    return CURRENT_MODEL.includes("anthropic.claude");
+};
+
+export const isDeepseekModel = () => {
+    return CURRENT_MODEL.includes("deepseek");
+};
+
+export const isGeminiModel = () => {
+    return CURRENT_MODEL.includes("google.gemini");
 };

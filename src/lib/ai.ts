@@ -8,6 +8,7 @@ import {
   PENDULUM_RESPONSE,
   SOLEMN_RESPONSE,
 } from "./constants";
+import { isClaudeModel, isDeepseekModel, isGeminiModel } from "./util";
 
 export const JUDGE_SYSTEM_PROMPT = JUDGE_SYSTEM_PROMPT_v1_CHAIN_OF_THOUGHT;
 
@@ -23,7 +24,7 @@ const bedrockClient = new BedrockRuntimeClient({
 // Helper function to prepare model-specific payload
 const prepareModelPayload = (modelId: string, systemPrompt: string, query: string) => {
   // Format for Claude models
-  if (modelId.includes("anthropic.claude")) {
+  if (isClaudeModel()) {
     return JSON.stringify({
       anthropic_version: "bedrock-2023-05-31",
       max_tokens: 1000,
@@ -34,7 +35,7 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
     });
   }
   // Format for DeepSeek models
-  else if (modelId.includes("deepseek")) {
+  else if (isDeepseekModel()) {
     return JSON.stringify({
       messages: [
         { role: "system", content: systemPrompt },
@@ -45,7 +46,7 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
     });
   }
   // Format for Google Gemini models, UNUSED
-  else if (modelId.includes("google.gemini")) {
+  else if (isGeminiModel()) {
     return JSON.stringify({
       contents: [
         { role: "system", parts: [{ text: systemPrompt }] },
@@ -64,11 +65,11 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
 // Extract text from model-specific response
 const extractResponseText = (modelId: string, responseBody: any) => {
   try {
-    if (modelId.includes("anthropic.claude")) {
+    if (isClaudeModel()) {
       return JSON.parse(responseBody).content[0].text;
-    } else if (modelId.includes("google.gemini")) {
+    } else if (isGeminiModel()) {
       return JSON.parse(responseBody).candidates[0].content.parts[0].text;
-    } else if (modelId.includes("deepseek")) {
+    } else if (isDeepseekModel()) {
       return JSON.parse(responseBody).choices[0].message.content;
     }
     
