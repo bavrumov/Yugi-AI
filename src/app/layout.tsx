@@ -6,6 +6,7 @@ import MillenniumBackground from "@/components/MillenniumBackground";
 import ThemeToggle from "@/components/ThemeToggle";
 import ThemeProviderWrapper from "@/components/ThemeProviderWrapper"; // Import the client-side ThemeProvider
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
         </ThemeProviderWrapper>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
