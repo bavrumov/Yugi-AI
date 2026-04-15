@@ -67,6 +67,25 @@ export default function Home() {
             </li>
           </ul>
         </div>
+
+        <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg p-6 shadow-md backdrop-blur-sm">
+          <h2 className="text-2xl font-semibold mb-2">Deck Tools</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">
+            Math-backed utilities to sharpen your deck building.
+          </p>
+          <Link
+            href="/calculator"
+            className="flex items-center justify-between rounded-lg px-4 py-3 text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200 dark:border-gray-700"
+          >
+            <div>
+              <div className="font-medium">Opening Hand Calculator</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Hypergeometric odds for starters &amp; bricks
+              </div>
+            </div>
+            <span className="ml-3 shrink-0">→</span>
+          </Link>
+        </div>
       </div>
     </>
   );
