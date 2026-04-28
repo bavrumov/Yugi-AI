@@ -62,12 +62,9 @@ AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your-access-key-id
 AWS_SECRET_ACCESS_KEY=your-secret-access-key
 AI_MODEL=us.anthropic.claude-3-7-sonnet-20250219-v1:0
-NEXT_PUBLIC_MAX_DURATION=60
 ```
 
 > **Tip:** The `AI_MODEL` value controls which Bedrock model is used. Claude is the default and recommended option. DeepSeek and Gemini model IDs are also supported.
->
-> **Tip:** `NEXT_PUBLIC_MAX_DURATION` sets the Vercel serverless function timeout in seconds. The Hobby plan hard-caps at 60. You can change this via Vercel's dashboard environment variables without a code deploy.
 
 ### 4. Run the development server
 
