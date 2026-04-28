@@ -16,16 +16,16 @@ export default function AnimatedResponse({ response, speed = 400 }: AnimatedResp
     }
     
     const characters = response.split('');
-    
+
     // Calculate interval based on desired character per second rate
     const interval = 1000 / speed;
     let currentIndex = 0;
 
     setIsTyping(true);
-    setDisplayText(characters[currentIndex]); // Start with the first character immediately
+    setDisplayText('');
 
     const timer = setInterval(() => {
-      if (currentIndex < characters.length - 1) { // len - 1 is used so it doesn't print undefined at the end
+      if (currentIndex < characters.length) {
         setDisplayText((prev) => prev + characters[currentIndex]);
         currentIndex++;
       } else {

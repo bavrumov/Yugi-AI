@@ -9,7 +9,7 @@ No account. No setup. Just rulings.
 ## Features
 
 - **Judge-quality rulings** — powered by Claude via AWS Bedrock, configured with a chain-of-thought system prompt tuned for accuracy and TCG correctness
-- **Confidence scoring** — every ruling includes a confidence percentage so you know how certain the answer is
+- **Grounded rulings** — real card effect text is fetched from YGOPRODeck and injected into every ruling call so the model reasons over ground truth, not recalled training data
 - **Player shorthand understood** — ask about "Ash", "Imperm", "D-Shifter", or any other common nickname; the model knows what you mean
 - **Multi-model support** — runs on Claude (default), DeepSeek, or Gemini via AWS Bedrock; switch models via env var
 - **Instant answers for common questions** — predefined, verified responses for frequently asked rulings (Pendulum Summon, Ash vs Called by the Grave, Solemn Strike, Mirrorjade) skip the model entirely for zero-latency results
@@ -62,9 +62,12 @@ AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your-access-key-id
 AWS_SECRET_ACCESS_KEY=your-secret-access-key
 AI_MODEL=us.anthropic.claude-3-7-sonnet-20250219-v1:0
+NEXT_PUBLIC_MAX_DURATION=60
 ```
 
 > **Tip:** The `AI_MODEL` value controls which Bedrock model is used. Claude is the default and recommended option. DeepSeek and Gemini model IDs are also supported.
+>
+> **Tip:** `NEXT_PUBLIC_MAX_DURATION` sets the Vercel serverless function timeout in seconds. The Hobby plan hard-caps at 60. You can change this via Vercel's dashboard environment variables without a code deploy.
 
 ### 4. Run the development server
 
