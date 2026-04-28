@@ -1,6 +1,8 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 import {
   ASH_RESPONSE,
+  CARD_EXTRACTION_MODEL,
+  CARD_EXTRACTION_PROMPT,
   DEFAULT_CLAUDE_MODEL,
   JUDGE_SYSTEM_PROMPT_v1,
   JUDGE_SYSTEM_PROMPT_v1_CHAIN_OF_THOUGHT,
@@ -8,6 +10,7 @@ import {
   PENDULUM_RESPONSE,
   SOLEMN_RESPONSE,
 } from "./constants";
+import { fetchMultipleCardTexts } from "./ygoprodeck";
 import { isClaudeModel, isDeepseekModel, isGeminiModel } from "./util";
 
 export const JUDGE_SYSTEM_PROMPT = JUDGE_SYSTEM_PROMPT_v1_CHAIN_OF_THOUGHT;
@@ -27,7 +30,7 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
   if (isClaudeModel()) {
     return JSON.stringify({
       anthropic_version: "bedrock-2023-05-31",
-      max_tokens: 1000,
+      max_tokens: 1500,
       temperature: 0.1, // Add this line to lower output randomness and increase correctness, perfect for /judge
       top_p: 0.9,
       system: systemPrompt,
@@ -97,6 +100,35 @@ const getConstantResponse = (query: string): string => {
   return "";
 };
 
+// Stage 1: Extract canonical card names from the user query via Haiku
+export async function extractCardNames(query: string): Promise<string[]> {
+  try {
+    const payload = JSON.stringify({
+      anthropic_version: "bedrock-2023-05-31",
+      max_tokens: 200,
+      temperature: 0,
+      system: CARD_EXTRACTION_PROMPT,
+      messages: [{ role: "user", content: query }]
+    });
+
+    const command = new InvokeModelCommand({
+      modelId: CARD_EXTRACTION_MODEL,
+      contentType: "application/json",
+      accept: "application/json",
+      body: payload
+    });
+
+    const response = await bedrockClient.send(command);
+    const responseBody = new TextDecoder().decode(response.body);
+    const text = JSON.parse(responseBody).content[0].text.trim();
+    const cardNames = JSON.parse(text);
+    return Array.isArray(cardNames) ? cardNames : [];
+  } catch (error) {
+    console.error("Error extracting card names:", error);
+    return []; // Graceful fallback — ruling call proceeds without injection
+  }
+}
+
 // Get ruling from AI model
 export async function getJudgeRuling(query: string): Promise<string> {
   // Check if the query matches one of the four default
@@ -106,8 +138,19 @@ export async function getJudgeRuling(query: string): Promise<string> {
   }
   // Otherwise, get the ruling from the model
   try {
+    // Stage 1: Extract card names via Haiku
+    const cardNames = await extractCardNames(query);
+
+    // Stage 2: Fetch card text from YGOPRODeck (parallel)
+    const cardContext = await fetchMultipleCardTexts(cardNames);
+
+    // Stage 3: Build augmented system prompt and call Sonnet
     const modelId = process.env.AI_MODEL || DEFAULT_CLAUDE_MODEL;
-    const payload = prepareModelPayload(modelId, JUDGE_SYSTEM_PROMPT, query);
+    const augmentedSystemPrompt = cardContext
+      ? `${JUDGE_SYSTEM_PROMPT}\n\n${cardContext}`
+      : JUDGE_SYSTEM_PROMPT;
+
+    const payload = prepareModelPayload(modelId, augmentedSystemPrompt, query);
 
     const command = new InvokeModelCommand({
       modelId: modelId,
@@ -115,12 +158,12 @@ export async function getJudgeRuling(query: string): Promise<string> {
       accept: "application/json",
       body: payload
     });
-    
+
     const response = await bedrockClient.send(command);
-    
+
     // Convert the UInt8Array to string
     const responseBody = new TextDecoder().decode(response.body);
-    
+
     return extractResponseText(modelId, responseBody);
   } catch (error) {
     console.error("Error getting ruling:", error);

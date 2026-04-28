@@ -9,7 +9,7 @@ No account. No setup. Just rulings.
 ## Features
 
 - **Judge-quality rulings** — powered by Claude via AWS Bedrock, configured with a chain-of-thought system prompt tuned for accuracy and TCG correctness
-- **Confidence scoring** — every ruling includes a confidence percentage so you know how certain the answer is
+- **Grounded rulings** — real card effect text is fetched from YGOPRODeck and injected into every ruling call so the model reasons over ground truth, not recalled training data
 - **Player shorthand understood** — ask about "Ash", "Imperm", "D-Shifter", or any other common nickname; the model knows what you mean
 - **Multi-model support** — runs on Claude (default), DeepSeek, or Gemini via AWS Bedrock; switch models via env var
 - **Instant answers for common questions** — predefined, verified responses for frequently asked rulings (Pendulum Summon, Ash vs Called by the Grave, Solemn Strike, Mirrorjade) skip the model entirely for zero-latency results
