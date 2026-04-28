@@ -26,8 +26,9 @@ export default function AnimatedResponse({ response, speed = 400 }: AnimatedResp
 
     const timer = setInterval(() => {
       if (currentIndex < characters.length) {
-        setDisplayText((prev) => prev + characters[currentIndex]);
+        const char = characters[currentIndex];
         currentIndex++;
+        setDisplayText((prev) => prev + char);
       } else {
         clearInterval(timer);
         setIsTyping(false);
