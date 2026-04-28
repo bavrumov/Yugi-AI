@@ -122,7 +122,9 @@ export async function extractCardNames(query: string): Promise<string[]> {
     const responseBody = new TextDecoder().decode(response.body);
     const text = JSON.parse(responseBody).content[0].text.trim();
     const cardNames = JSON.parse(text);
-    return Array.isArray(cardNames) ? cardNames : [];
+    const result = Array.isArray(cardNames) ? cardNames : [];
+    console.log("Extracted card names:", result);
+    return result;
   } catch (error) {
     console.error("Error extracting card names:", error);
     return []; // Graceful fallback — ruling call proceeds without injection

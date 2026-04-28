@@ -28,10 +28,11 @@ export default function MillenniumBackground() {
   return (
     <div className="fixed inset-0 z-0 flex items-center justify-center opacity-10 dark:opacity-20 pointer-events-none">
       <div className="relative w-64 h-64 md:w-80 md:h-80">
-        <Image 
+        <Image
           src={`/images/millennium-items/${item}.png`}
           alt={`Millennium ${item}`}
           fill
+          sizes="(max-width: 768px) 256px, 320px"
           className="object-contain"
           priority
         />
