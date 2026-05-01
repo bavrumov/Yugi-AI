@@ -44,7 +44,7 @@ const prepareModelPayload = (modelId: string, systemPrompt: string, query: strin
         { role: "system", content: systemPrompt },
         { role: "user", content: query }
       ],
-      max_tokens: 1000,
+      max_tokens: 8000, // R1 burns tokens on chain-of-thought before producing content
       temperature: 0.1 // Lowers output randomness and increase correctness, perfect for /judge
     });
   }
@@ -73,7 +73,8 @@ const extractResponseText = (modelId: string, responseBody: any) => {
     } else if (isGeminiModel()) {
       return JSON.parse(responseBody).candidates[0].content.parts[0].text;
     } else if (isDeepseekModel()) {
-      return JSON.parse(responseBody).choices[0].message.content;
+      const msg = JSON.parse(responseBody).choices[0].message;
+      return msg.content ?? msg.reasoning_content ?? null;
     }
     
     throw new Error(`Unsupported model response format: ${modelId}`);
@@ -120,7 +121,8 @@ export async function extractCardNames(query: string): Promise<string[]> {
 
     const response = await bedrockClient.send(command);
     const responseBody = new TextDecoder().decode(response.body);
-    const text = JSON.parse(responseBody).content[0].text.trim();
+    const raw = JSON.parse(responseBody).content[0].text.trim();
+    const text = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
     const cardNames = JSON.parse(text);
     const result = Array.isArray(cardNames) ? cardNames : [];
     console.log("Extracted card names:", result);
@@ -165,6 +167,7 @@ export async function getJudgeRuling(query: string): Promise<string> {
 
     // Convert the UInt8Array to string
     const responseBody = new TextDecoder().decode(response.body);
+    console.log("Model response (first 300 chars):", responseBody.substring(0, 300));
 
     return extractResponseText(modelId, responseBody);
   } catch (error) {
