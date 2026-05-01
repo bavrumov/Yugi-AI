@@ -9,9 +9,10 @@ No account. No setup. Just rulings.
 ## Features
 
 - **Judge-quality rulings** — powered by Claude via AWS Bedrock, configured with a chain-of-thought system prompt tuned for accuracy and TCG correctness
-- **Grounded rulings** — real card effect text is fetched from YGOPRODeck and injected into every ruling call so the model reasons over ground truth, not recalled training data
+- **Grounded rulings** — a two-stage pipeline first extracts card names from your query (Claude Haiku), fetches their official effect text from YGOPRODeck, then injects it into the ruling prompt so the model reasons over ground truth, not recalled training data
+- **Opening Hand Calculator** — hypergeometric probability calculator for deck building; shows starter open rates, brick-avoidance odds, the "Golden Zone" (≥85% open rate) and "Danger Zone" thresholds across 40–60 card decks for going-first and going-second hands
 - **Player shorthand understood** — ask about "Ash", "Imperm", "D-Shifter", or any other common nickname; the model knows what you mean
-- **Multi-model support** — runs on Claude (default), DeepSeek, or Gemini via AWS Bedrock; switch models via env var
+- **Multi-model support** — runs on Claude (default), DeepSeek R1, or Gemini via AWS Bedrock; switch models via a single env var
 - **Instant answers for common questions** — predefined, verified responses for frequently asked rulings (Pendulum Summon, Ash vs Called by the Grave, Solemn Strike, Mirrorjade) skip the model entirely for zero-latency results
 - **Content filtering** — built-in profanity filtering with a YGO-safe terms allowlist (e.g. "Snatch Steal" is not flagged)
 - **Dark / light mode** — theme toggle with system preference detection
@@ -27,7 +28,7 @@ No account. No setup. Just rulings.
 | Language | TypeScript |
 | Styling | Tailwind CSS |
 | AI Provider | AWS Bedrock |
-| AI Models | Anthropic Claude 3.7 Sonnet · DeepSeek · Gemini |
+| AI Models | Anthropic Claude · DeepSeek R1 · Gemini (via AWS Bedrock) |
 | Analytics | Vercel Analytics + Speed Insights |
 
 ---
@@ -106,15 +107,22 @@ For full AWS infrastructure setup — IAM user, Bedrock model access, and deploy
 ```
 src/
 ├── app/
-│   ├── api/          # Next.js API routes (judge endpoint)
-│   ├── judge/        # Judge page
-│   └── page.tsx      # Landing page
-├── components/       # UI components (QueryForm, AnimatedResponse, ThemeToggle, …)
+│   ├── api/judge/        # POST /api/judge — two-stage ruling pipeline
+│   ├── calculator/       # Opening Hand Calculator page
+│   ├── judge/            # Judge ruling page
+│   └── page.tsx          # Landing page
+├── components/
+│   ├── AnimatedResponse  # Streams ruling text character-by-character
+│   ├── HandCalculator    # Hypergeometric probability UI (Recharts, client-only)
+│   ├── JudgeContent      # Reads ?q= param, calls /api/judge, renders response
+│   ├── QueryForm         # Shared ruling input form
+│   └── ThemeToggle       # Dark/light mode switch
 └── lib/
-    ├── ai.ts         # Bedrock client and model invocation logic
-    ├── constants.ts  # System prompts, predefined responses, shared constants
-    ├── util.ts       # Model detection helpers, input sanitisation
-    └── theme.ts      # Theme utilities
+    ├── ai.ts             # Bedrock client, two-stage pipeline, payload/response helpers
+    ├── constants.ts      # System prompts (v0–v2), card extraction prompt, canned responses
+    ├── util.ts           # Model detection, input sanitisation, profanity filter
+    ├── ygoprodeck.ts     # YGOPRODeck API client (card text fetcher)
+    └── theme.ts          # Theme utilities
 ```
 
 ---
