@@ -196,21 +196,22 @@ First, provide a brief summary of the ruling (1-3 sentences). Then ask if the us
 
 
 
-export const PENDULUM_RESPONSE = `# RULING
-To Pendulum Summon, place Pendulum Monsters in your Pendulum Zones, then once per turn during your Main Phase, you can Special Summon monsters from your hand and/or face-up Extra Deck whose Levels are between your Pendulum Scales.
+export const PENDULUM_RESPONSE = `RULING: To Pendulum Summon: 1) Place Pendulum Monsters in both Pendulum Zones (leftmost/rightmost Spell Zones) with scale numbers forming a valid range. 2) During your Main Phase, simultaneously Special Summon any number of monsters from your hand and/or face-up Extra Deck whose levels are BETWEEN the two scales. This can be done once per turn.
 
-# EXPLANATION
-Pendulum Summoning requires:
-1. Having Pendulum Monsters in both your left and right Pendulum Zones with different Pendulum Scale values
-2. During your Main Phase 1 or 2, you can Pendulum Summon monsters whose Levels are between (but not equal to) your Pendulum Scales
-3. You can summon multiple monsters simultaneously from your hand and/or face-up Pendulum Monsters from your Extra Deck
-4. Pendulum Monsters that would be sent from the field to the GY are placed face-up in your Extra Deck instead
-5. You can only Pendulum Summon once per turn
+EXPLANATION:
+1. **Scale Setup**: The lower scale number must be in the left Pendulum Zone, higher in the right. The valid summon range is levels > left scale AND < right scale (e.g., scales 3 & 6 allows levels 4-5).
+2. **Summon Timing**: Declare Pendulum Summon during your Main Phase when no chain is resolving.
+3. **Sources**: Can summon from hand and/or face-up Extra Deck (Pendulum Monsters that were previously destroyed/sent from field to ED).
+4. **Zones**: Monsters from hand go to Main Monster Zones; ED monsters can go to any legal zone (Extra Monster Zone or Main Monster Zones under MR5).
+5. **Response Window**: After declaring the summon, opponents can activate cards like "Solemn Judgment" to negate it before monsters hit the field.
 
-Remember that Pendulum Monsters from the Extra Deck must be summoned to either the Extra Monster Zone or a zone a Link Monster points to.
+KEY NOTES:
+- Pendulum Summoning is a Special Summon action (doesn't start a chain)
+- Scales remain as Continuous Spells after summoning
+- You cannot Pendulum Summon if scales are equal (e.g., 5 & 5) or inverted (left scale > right scale)
+- "Pendulum Summon" ≠ activating a Pendulum Monster's effect - it's a game mechanic
 
-# CONFIDENCE
-100%`;
+ERRATA NOTE: Some older Pendulum Monsters (e.g., "Odd-Eyes Pendulum Dragon") received text updates to clarify they can be placed in Pendulum Zones. Always check for "Pendulum Effect" headers to confirm.`;
 
 export const PENDULUM_RESPONSE_JSON = {
   "RULING": "To Pendulum Summon, place Pendulum Monsters in your Pendulum Zones, then once per turn during your Main Phase, you can Pendulum Summon monsters from your hand and/or face-up Extra Deck whose Levels are between your Pendulum Scales.",
@@ -218,14 +219,22 @@ export const PENDULUM_RESPONSE_JSON = {
   "CONFIDENCE": "100%"
 }
 
-export const ASH_RESPONSE = `# RULING
-If Called by the Grave is chained to Ash Blossom & Joyous Spring, Ash Blossom's effect will be negated and will not resolve. However, if Called by the Grave is activated before Ash Blossom is activated (not as a direct chain), then Ash Blossom cannot be activated at all while Called by the Grave's effect is applying.
+export const ASH_RESPONSE = `RULING: Called by the Grave can negate Ash Blossom's effect if activated in direct response to Ash's activation, but only after Ash has already been discarded as cost. Ash's effect will still be negated even though it was already activated.
 
-# EXPLANATION
-Called by the Grave has two distinct effects: it negates the activated effects of the targeted monster, and it prevents the activation of effects of monsters with the same name. If Called by the Grave is chained directly to Ash Blossom (Chain Link 2 to Ash's Chain Link 1), it will negate Ash's effect when the chain resolves. If Called by the Grave was activated in a previous chain and successfully resolved (targeting Ash Blossom in the GY), then its lingering effect prevents the player from activating any Ash Blossom effects for the rest of that turn.
+EXPLANATION:
+1. When an effect like **Pot of Desires** activates (Chain Link 1), the opponent can chain **Ash Blossom** (Chain Link 2), discarding itself as cost.
+2. You can then chain **Called by the Grave** (Chain Link 3), targeting the Ash Blossom now in the GY.
+3. The chain resolves backward:
+   - **Called by** banishes Ash and negates its effects.
+   - **Ash's effect** is now negated and does nothing.
+   - The original effect (e.g., Pot of Desires) resolves normally.
 
-# CONFIDENCE
-100%`;
+KEY POINTS:
+- Ash is *already in the GY* when Called by targets it (discarding is part of Ash's activation cost).
+- Called by negates Ash's effect retroactively, even though it was activated earlier in the chain.
+- If Called by is activated preemptively (e.g., earlier in the turn before Ash is used), it would prevent Ash from being activated at all during the negation period.
+
+ERRATA NOTE: This interaction relies on the official ruling that Called by the Grave can negate effects that were already activated but not yet resolved, as long as the targeted monster is in the GY when Called by resolves.`;
 
 export const ASH_RESPONSE_JSON = {
   "RULING": "If Called by the Grave is chained to Ash Blossom & Joyous Spring, it will negate Ash's effect. However, if Called by the Grave is activated before Ash Blossom is activated, then Ash can still be activated and its effect will resolve normally.",
@@ -233,14 +242,25 @@ export const ASH_RESPONSE_JSON = {
   "CONFIDENCE": "100%"
 }
 
-export const SOLEMN_RESPONSE = `# RULING
-Yes, you can chain Solemn Strike to a monster effect, but only when that monster effect is activated (not when it resolves).
+export const SOLEMN_RESPONSE = `RULING: Yes, Solemn Strike can be chained to negate the activation of a monster effect, provided it's activated in direct response to that effect's activation.
 
-# EXPLANATION
-Solemn Strike's text states "When a monster effect is activated, OR when a monster(s) would be Special Summoned: Pay 1500 LP; negate the activation, and if you do, destroy that card." This means Solemn Strike can respond to the activation of any monster effect, whether it's from a monster on the field, in the hand, GY, or banished zone. However, you must chain it directly to the activation of that effect - you cannot wait until the effect resolves to use Solemn Strike. Also note that Solemn Strike negates the activation itself, not just the effect, meaning the entire chain link is treated as if it never happened.
+EXPLANATION: Solemn Strike has two activation conditions:
+1) When a monster(s) would be Special Summoned
+2) When a monster effect is activated
 
-# CONFIDENCE
-100%`;
+As a Counter Trap (Spell Speed 3), it can be chained directly to the activation of any monster effect (including Quick Effects) that meets these criteria. When chained this way:
+- Strike negates the monster effect's **activation** (not just the effect)
+- Destroys the monster whose effect was activated
+- Costs (like discarding) paid for the negated effect remain paid
+
+Example Chain:
+CL1: Opponent activates Dark Magician's effect (targeting)
+CL2: You activate Solemn Strike (negating activation)
+Resolution:
+CL2: Strike resolves first, negating and destroying Dark Magician
+CL1: Dark Magician's effect is never applied
+
+KEY NOTE: Strike cannot negate continuous monster effects that don't activate (e.g., Skill Drain's ATK reduction), nor can it negate effects that are already resolving (it must respond to the activation itself).`;
 
 export const SOLEMN_RESPONSE_JSON = {
   "RULING": "Yes, you can chain Solemn Strike to a monster effect, but only when that monster effect is activated, not when it resolves. Solemn Strike can negate the activation of any monster effect and destroy that monster.",
@@ -248,14 +268,17 @@ export const SOLEMN_RESPONSE_JSON = {
   "CONFIDENCE": "100% - This is a fundamental application of Solemn Strike's card text and is consistently ruled this way at all levels of play."
 };
 
-export const MIRRORJADE_RESPONSE = `# RULING
-Yes, Mirrorjade the Iceblade Dragon's destruction effect will trigger when it is banished from the field by Traptrix Pudica's effect.
+export const MIRRORJADE_RESPONSE = `RULING: Yes, Mirrorjade the Iceblade Dragon's destruction effect will trigger when banished by Traptrix Pudica's effect. The effect activates during the End Phase after Mirrorjade leaves the field.
 
-# EXPLANATION
-Mirrorjade's effect states "If this Fusion Summoned card you control leaves the field: Destroy all monsters on the field during the End Phase of this turn." This is a trigger effect that activates when Mirrorjade leaves the field by any means (including being banished). Being banished by Pudica counts as "leaving the field," which fulfills the activation condition for Mirrorjade's effect. The effect will activate and resolve normally, setting up the field-wide destruction during that turn's End Phase.
+EXPLANATION: Mirrorjade's effect states: "If this Fusion Summoned card in its owner's control leaves the field: You can activate this effect during the End Phase; destroy all monsters your opponent controls." Since Pudica's effect banishes Mirrorjade (making it leave the field), this meets Mirrorjade's trigger condition. The effect doesn't need to activate immediately when leaving — it creates a delayed trigger that can be activated in the End Phase, even though Mirrorjade is already banished.
 
-# CONFIDENCE
-100%`;
+KEY POINTS:
+1. Mirrorjade's effect triggers on any form of leaving the field (including banishing)
+2. The effect activation occurs later in the End Phase, separate from the initial banishment
+3. Pudica's effect doesn't prevent Mirrorjade's delayed effect from activating
+4. Mirrorjade's controller chooses whether to activate the destruction effect during their End Phase
+
+This interaction works even if Mirrorjade was banished face-down, as the trigger only requires leaving the field, not specifically being sent to a particular location face-up.`;
 
 export const MIRRORJADE_RESPONSE_JSON = {
   "RULING": "Yes, Mirrorjade the Iceblade Dragon's destruction effect will trigger when it is banished by Traptrix Pudica's effect. The effect activates when Mirrorjade leaves the field, which includes being banished.",
