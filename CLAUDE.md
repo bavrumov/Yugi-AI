@@ -76,11 +76,7 @@ Model selection is controlled by the `AI_MODEL` environment variable. Detection 
 
 `constants.ts` contains several prompt variants; `JUDGE_SYSTEM_PROMPT` in `ai.ts` selects which one is active:
 
-- `v0` — baseline
-- `v1` — improved structure and PSCT awareness  
-- `v1_CHAIN_OF_THOUGHT` — **currently active** — adds official errata edge cases (Evilswarm Castor, SEGOC, etc.)
-- `v1_JSON` — JSON response format (unused)
-- `v2` — condensed token-efficient version (unused)
+- `v1_2` — **currently active** — adds official errata edge cases (Evilswarm Castor, SEGOC, etc.)
 
 ---
 
