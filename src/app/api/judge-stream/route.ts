@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { streamJudgeRuling } from '@/lib/ai';
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
