@@ -4,7 +4,7 @@ import {
   CARD_EXTRACTION_MODEL,
   CARD_EXTRACTION_PROMPT,
   DEFAULT_CLAUDE_MODEL,
-  JUDGE_SYSTEM_PROMPT_v1_2,
+  JUDGE_SYSTEM_PROMPT_v1_2_1,
   MIRRORJADE_RESPONSE,
   PENDULUM_RESPONSE,
   SOLEMN_RESPONSE,
@@ -12,7 +12,7 @@ import {
 import { fetchMultipleCardTexts } from "./ygoprodeck";
 import { isClaudeModel, isDeepseekModel, isGeminiModel } from "./util";
 
-export const JUDGE_SYSTEM_PROMPT = JUDGE_SYSTEM_PROMPT_v1_2;
+export const JUDGE_SYSTEM_PROMPT = JUDGE_SYSTEM_PROMPT_v1_2_1;
 
 // Initialize the AWS Bedrock client
 const bedrockClient = new BedrockRuntimeClient({

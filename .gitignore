@@ -26,5 +26,8 @@ node_modules/
 # TypeScript build cache
 tsconfig.tsbuildinfo
 
+# Local design documents
+design-docs/
+
 # Testing artifacts
 testing-screenshots/

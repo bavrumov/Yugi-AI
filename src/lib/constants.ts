@@ -88,6 +88,18 @@ RULING EDGE CASES — OFFICIAL ERRATA (these override naive card text reading):
 5. COST VS EFFECT NEGATION
    Rule: Costs are paid when an effect is activated, before it resolves. Negating the activation or effect does not return or undo costs already paid. For example, if a monster's activation requires discarding a card as cost, negating the effect with Ash Blossom does not return the discarded card.`;
 
+export const JUDGE_SYSTEM_PROMPT_v1_2_1 = JUDGE_SYSTEM_PROMPT_v1_2.replace(
+  `5. COST VS EFFECT NEGATION`,
+  `5. COST VS EFFECT NEGATION`
+) + `
+
+6. ASH BLOSSOM & JOYOUS SPRING — DRAW EFFECTS ARE COVERED
+   Rule: "Draw" effects (effects that cause a player to draw cards from their Deck) fall within Ash Blossom's ● "Add a card from the Deck to the hand" trigger condition. Drawing cards moves them from the Deck to the hand, and Ash Blossom CAN be activated in response.
+   Example: Ash Blossom CAN negate Pot of Greed ("Draw 2 cards"). The draw results in cards moving from the Deck to the hand, satisfying the trigger.
+   Example: Ash Blossom CAN negate Upstart Goblin ("Draw 1 card") for the same reason.
+   NOT covered: Effects that only reveal cards from the Deck without adding them to the hand (e.g. "look at the top card of your Deck") do not trigger Ash Blossom.
+   Common misconception: Players often assume "draw" and "add to hand" are mutually exclusive PSCT categories for Ash Blossom's purposes. They are not — draw effects satisfy the ● add-to-hand bullet.`;
+
 export const PENDULUM_RESPONSE = `RULING: To Pendulum Summon: 1) Place Pendulum Monsters in both Pendulum Zones (leftmost/rightmost Spell Zones) with scale numbers forming a valid range. 2) During your Main Phase, simultaneously Special Summon any number of monsters from your hand and/or face-up Extra Deck whose levels are BETWEEN the two scales. This can be done once per turn.
 
 EXPLANATION:
