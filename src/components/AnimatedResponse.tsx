@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { renderWithBold } from '@/lib/renderWithBold';
 
 interface AnimatedResponseProps {
   response: string;
@@ -41,7 +42,7 @@ export default function AnimatedResponse({ response, speed = 800 }: AnimatedResp
   return (
     <div className="relative">
       <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg p-4 shadow-md backdrop-blur-sm text-gray-900 dark:text-gray-100 animate-fadeIn">
-        <p className="whitespace-pre-wrap">{displayText}</p>
+        <p className="whitespace-pre-wrap">{renderWithBold(displayText)}</p>
         {isTyping && (
           <span className="inline-block w-2 h-4 ml-1 bg-gray-900 dark:bg-gray-100 animate-blink" />
         )}

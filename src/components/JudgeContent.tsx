@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import QueryForm from '@/components/QueryForm';
 import AnimatedResponse from '@/components/AnimatedResponse';
 import StageIndicator, { Stage } from '@/components/StageIndicator';
+import { renderWithBold } from '@/lib/renderWithBold';
 
 export default function JudgeContent() {
   const searchParams = useSearchParams();
@@ -142,7 +143,7 @@ export default function JudgeContent() {
               )}
               {streamingText && (
                 <p className="whitespace-pre-wrap text-gray-900 dark:text-gray-100">
-                  {streamingText.trimStart()}
+                  {renderWithBold(streamingText.trimStart())}
                 </p>
               )}
             </div>
