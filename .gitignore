@@ -23,5 +23,8 @@ node_modules/
 .vscode/
 .idea/
 
+# TypeScript build cache
+tsconfig.tsbuildinfo
+
 # Testing artifacts
 testing-screenshots/

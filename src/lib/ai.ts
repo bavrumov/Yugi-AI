@@ -1,4 +1,4 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
+import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamCommand } from "@aws-sdk/client-bedrock-runtime";
 import {
   ASH_RESPONSE,
   CARD_EXTRACTION_MODEL,
@@ -174,6 +174,112 @@ export async function getJudgeRuling(query: string): Promise<string> {
     return "Sorry, I couldn't process your request. Please try again.";
   }
 
+}
+
+export type StreamEvent =
+  | { type: 'stage'; stage: string; message: string }
+  | { type: 'token'; content: string }
+  | { type: 'complete' }
+  | { type: 'error'; message: string };
+
+export async function* streamJudgeRuling(query: string): AsyncGenerator<StreamEvent> {
+  const constantResponse = getConstantResponse(query);
+  if (constantResponse) {
+    yield { type: 'token', content: constantResponse };
+    yield { type: 'complete' };
+    return;
+  }
+
+  try {
+    yield { type: 'stage', stage: 'parse_query', message: 'Understanding question...' };
+
+    const cardNames = await extractCardNames(query);
+    const cardMsg = cardNames.length > 0
+      ? `Detected ${cardNames.length} card${cardNames.length !== 1 ? 's' : ''}...`
+      : 'Parsing card context...';
+    yield { type: 'stage', stage: 'extract_cards', message: cardMsg };
+
+    const cardContext = await fetchMultipleCardTexts(cardNames);
+    yield { type: 'stage', stage: 'fetch_cards', message: 'Fetching official card text...' };
+
+    const modelId = process.env.AI_MODEL || DEFAULT_CLAUDE_MODEL;
+    const augmentedSystemPrompt = cardContext
+      ? `${JUDGE_SYSTEM_PROMPT}\n\n${cardContext}`
+      : JUDGE_SYSTEM_PROMPT;
+
+    const payload = prepareModelPayload(modelId, augmentedSystemPrompt, query);
+
+    const command = new InvokeModelWithResponseStreamCommand({
+      modelId,
+      contentType: 'application/json',
+      accept: 'application/json',
+      body: payload,
+    });
+
+    yield { type: 'stage', stage: 'reasoning', message: 'Applying PSCT logic...' };
+
+    const streamResponse = await bedrockClient.send(command);
+
+    // Always show generate stage before tokens start arriving
+    yield { type: 'stage', stage: 'generate', message: 'Generating ruling...' };
+
+    // For DeepSeek R1: suppress tokens while inside the hidden <think> block
+    let inThinkBlock = isDeepseekModel();
+    let thinkBuffer = '';
+    let firstChunk = true;
+
+    for await (const event of streamResponse.body!) {
+      if (!('chunk' in event) || !event.chunk?.bytes) continue;
+
+      const chunkText = new TextDecoder().decode(event.chunk.bytes);
+      let token: string | null = null;
+
+      try {
+        const parsed = JSON.parse(chunkText);
+        if (firstChunk) {
+          console.log('[judge-stream] first chunk:', JSON.stringify(parsed).slice(0, 200));
+          firstChunk = false;
+        }
+        if (isClaudeModel()) {
+          if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+            token = parsed.delta.text;
+          }
+        } else if (isDeepseekModel()) {
+          // Try streaming delta format first, fall back to full message format
+          const choice = parsed.choices?.[0];
+          token = choice?.delta?.content ?? choice?.message?.content ?? null;
+        }
+      } catch {
+        continue;
+      }
+
+      if (token === null || token === '') continue;
+
+      if (!inThinkBlock) {
+        yield { type: 'token', content: token };
+      } else {
+        // Buffer until </think> tag is fully received
+        thinkBuffer += token;
+        const closeIdx = thinkBuffer.indexOf('</think>');
+        if (closeIdx !== -1) {
+          inThinkBlock = false;
+          const remaining = thinkBuffer.substring(closeIdx + '</think>'.length).replace(/^\n+/, '');
+          if (remaining) yield { type: 'token', content: remaining };
+          thinkBuffer = '';
+        } else if (thinkBuffer.length > 50 && !thinkBuffer.startsWith('<think>')) {
+          // No think block present — emit buffered content directly
+          inThinkBlock = false;
+          yield { type: 'token', content: thinkBuffer };
+          thinkBuffer = '';
+        }
+      }
+    }
+
+    yield { type: 'complete' };
+  } catch (error) {
+    console.error('Error in streamJudgeRuling:', error);
+    yield { type: 'error', message: 'Failed to process your request. Please try again.' };
+  }
 }
 
 // Dummy endpoint, just dumps the request or returns a constant response
