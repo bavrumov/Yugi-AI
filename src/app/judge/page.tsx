@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import JudgeContent from '@/components/JudgeContent';
 
+export const dynamic = 'force-static';
+
 export default function JudgePage() {
   return (
     <>
