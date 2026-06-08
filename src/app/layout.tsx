@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: APP_NAME,
   description: APP_DESCRIPTION,
   icons: {
-    icon: "/images/millennium-items/puzzle.png", // Default favicon
+    icon: "/images/millennium-items/ring.png",
   },
 };
 
