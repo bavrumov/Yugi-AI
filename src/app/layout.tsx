@@ -8,7 +8,7 @@ import ThemeProviderWrapper from "@/components/ThemeProviderWrapper"; // Import 
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: APP_NAME,

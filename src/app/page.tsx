@@ -1,46 +1,27 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
 import { APP_NAME } from '@/lib/constants';
-import QueryForm from '@/components/QueryForm';
+import HomeQueryForm from '@/components/HomeQueryForm';
+
+export const dynamic = 'force-static';
 
 export default function Home() {
-  const [query, setQuery] = useState('');
-  const [response, setResponse] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const handleSubmit = async (queryText: string) => {
-    setQuery(queryText);
-    setIsLoading(true);
-    
-    try {
-      // Redirect to judge page with query
-      window.location.href = `/judge?q=${encodeURIComponent(queryText)}`;
-    } catch (error) {
-      console.error("Error:", error);
-      setResponse("Sorry, there was an error processing your request.");
-      setIsLoading(false);
-    }
-  };
-  
   return (
     <>
       <h1 className="text-4xl font-bold mb-2 text-center">{APP_NAME}</h1>
       <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 text-center">
         Instant Yu-Gi-Oh! TCG rulings at your fingertips
       </p>
-      
+
       <div className="w-full max-w-2xl mb-8">
         <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg p-6 shadow-md backdrop-blur-sm">
           <h2 className="text-2xl font-semibold mb-4">Ask the Judge</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
             Get instant rulings on card interactions, timing, and mechanics. Just type your question below.
           </p>
-          <QueryForm onSubmit={handleSubmit} isLoading={isLoading} />
+          <HomeQueryForm />
         </div>
       </div>
-      
+
       <div className="w-full max-w-2xl space-y-4">
         <div className="bg-white/80 dark:bg-gray-800/80 rounded-lg p-6 shadow-md backdrop-blur-sm">
           <h2 className="text-2xl font-semibold mb-4">Examples</h2>
@@ -62,7 +43,7 @@ export default function Home() {
             </li>
             <li>
               <Link href="/judge?q=Does Mirrorjade's destruction effect trigger when Traptrix Pudica's effect banishes it from the field?">
-                Does Mirrorjade's destruction effect trigger when Traptrix Pudica's effect banishes it from the field?
+                Does Mirrorjade&apos;s destruction effect trigger when Traptrix Pudica&apos;s effect banishes it from the field?
               </Link>
             </li>
           </ul>
