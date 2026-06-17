@@ -13,7 +13,7 @@
         "@vercel/analytics": "^1.5.0",
         "@vercel/speed-insights": "^1.2.0",
         "bad-words": "^4.0.0",
-        "next": "^15.3.0",
+        "next": "^15.5.19",
         "next-themes": "^0.2.1",
         "react": "^18",
         "react-dom": "^18",
