@@ -13,7 +13,7 @@
         "@vercel/analytics": "^1.5.0",
         "@vercel/speed-insights": "^1.2.0",
         "bad-words": "^4.0.0",
-        "next": "^15.5.22",
+        "next": "^16.3.0",
         "next-themes": "^0.2.1",
         "react": "^18",
         "react-dom": "^18",
@@ -26,7 +26,7 @@
         "autoprefixer": "^10.4.20",
         "eslint": "^8",
         "eslint-config-next": "^15.5.15",
-        "postcss": "^8.5.19",
+        "postcss": "^8.5.23",
         "tailwindcss": "^3.4.17",
         "typescript": "^5"
     }
