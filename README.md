@@ -15,6 +15,7 @@ No account. No setup. Just rulings.
 - **Multi-model support** — runs on DeepSeek R1 (production), Claude Sonnet, or Gemini via AWS Bedrock; switch models via a single env var
 - **Instant answers for common questions** — predefined, verified responses for frequently asked rulings (Pendulum Summon, Ash vs Called by the Grave, Solemn Strike, Mirrorjade) skip the model entirely for zero-latency results
 - **Content filtering** — built-in profanity filtering with a YGO-safe terms allowlist (e.g. "Snatch Steal" is not flagged)
+- **Rate limiting** — server-side, IP-based sliding-window limiter (10 requests/60s) backed by Upstash Redis, enforced on both ruling endpoints regardless of how they're called
 - **Dark / light mode** — theme toggle with system preference detection
 - **No account required** — open the app and start asking
 
@@ -29,6 +30,7 @@ No account. No setup. Just rulings.
 | Styling | Tailwind CSS |
 | AI Provider | AWS Bedrock |
 | AI Models | Anthropic Claude · DeepSeek R1 · Gemini (via AWS Bedrock) |
+| Rate Limiting | Upstash Redis (via `@upstash/ratelimit`) |
 | Analytics | Vercel Analytics + Speed Insights |
 
 ---
@@ -181,6 +183,18 @@ npm start
 ```
 
 For full AWS infrastructure setup — IAM user, Bedrock model access, and deployment options (Vercel, Amplify, EC2) — see the [AWS Setup Guide](./AWSSetupGuide.md).
+
+### Rate limiting setup
+
+Both `/api/judge` and `/api/judge-stream` enforce a server-side, IP-based sliding-window limit (10 requests/60s, `src/lib/ratelimit.ts`) backed by Upstash Redis — this closes the gap left by `QueryForm`'s client-side submit cooldown, which only throttles the browser tab and does nothing against direct requests to either endpoint.
+
+To enable it:
+
+1. In the Vercel dashboard, add the **Upstash Redis** integration (Storage tab → Create Database → Upstash → Redis) and connect it to this project.
+2. This injects `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` automatically — no manual env var entry needed. Leave the custom prefix blank; `Redis.fromEnv()` looks for those exact names.
+3. For local development, check the **Development** environment box when connecting the integration (this disables the "Sensitive" flag on the token, since sensitive vars can't be pulled to a local `.env` file), then run `vercel env pull .env.local`.
+
+If these env vars aren't set, rate limiting **fails open** (requests are allowed, a warning is logged) rather than breaking the app — so it's safe to deploy before the integration is connected, but the limiter won't actually do anything until it is.
 
 ---
 
