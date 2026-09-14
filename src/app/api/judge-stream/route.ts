@@ -1,9 +1,15 @@
 import { NextRequest } from 'next/server';
 import { streamJudgeRuling } from '@/lib/ai';
+import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
+  const { success } = await checkRateLimit(getClientIp(request));
+  if (!success) {
+    return new Response(JSON.stringify({ error: 'Too many requests. Please wait a moment and try again.' }), { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const query: unknown = body?.query;
 
