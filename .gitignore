@@ -31,3 +31,5 @@ design-docs/
 
 # Testing artifacts
 testing-screenshots/
+.vercel
+.env*

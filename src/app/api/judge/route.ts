@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDummyJudgeRuling, getJudgeRuling } from '@/lib/ai';
 import { isProdEnv } from '@/lib/util';
+import { checkRateLimit, getClientIp } from '@/lib/ratelimit';
 
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
+    const { success } = await checkRateLimit(getClientIp(request));
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait a moment and try again.' },
+        { status: 429 }
+      );
+    }
+
     const { query } = await request.json();
-    
+
     if (!query || typeof query !== 'string') {
       return NextResponse.json(
         { error: 'Invalid query parameter' },
