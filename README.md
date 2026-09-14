@@ -147,6 +147,28 @@ At current traffic the app costs less than a quarter per day.
 
 Anthropic's Claude models on Bedrock support prompt caching — repeated identical prompt prefixes are stored server-side and re-read at ~10% of the normal input token cost. Since the system prompt is 88% of every R1 input call and is identical on every request, caching it would cut input costs significantly. However, **DeepSeek R1 on Bedrock does not support prompt caching** — it is an Anthropic-only feature. Switching to Claude Haiku 4.5 for rulings and enabling caching would reduce per-ruling cost to ~$0.0042, but at the expense of R1's superior chain-of-thought reasoning quality. DeepSeek R1 remains the production model.
 
+### Multi-month actuals (May, July, August 2026)
+
+CPR here is measured directly from AWS billing (total Bedrock + tax for the month ÷ ruling count from CloudWatch), which is the ground truth figure — it captures both the Haiku and DeepSeek stages plus tax without relying on averaged token estimates.
+
+| Month | Rulings | Total AWS cost | **CPR (billing-derived)** |
+|---|---|---|---|
+| May | 28 | ~$0.20 | ~$0.0071 |
+| July | 70 | $0.7008 | **$0.0100** |
+| August | 30 | $0.2100 | **$0.0070** |
+
+> **Methodology note:** the production UI calls `/api/judge-stream`, which issues Bedrock's `InvokeModelWithResponseStreamCommand` — logged under `operation = "InvokeModelWithResponseStream"`, not `"InvokeModel"`. CloudWatch Insights queries that filter on `InvokeModel` alone will silently miss most real rulings (in August, only 2 of 30 rulings were non-streaming — a query scoped to `InvokeModel` would have overstated CPR by ~15×). Always match both operations when querying `yugiai-judge`.
+
+**Average tokens per ruling, by month:**
+
+| Month | Haiku in / out | DeepSeek in / out | Total tokens/ruling |
+|---|---|---|---|
+| May | 312 / 22 | 1,070 / 969 | 2,373 |
+| July | 372 / 25 | 1,219 / 1,315 | 2,931 |
+| August | 329 / 15 | 1,151 / 864 | 2,359 |
+
+July's CPR spike over May/August tracks directly to DeepSeek output tokens: a cluster of complex OCG chain-timing questions (organic traffic, largely in Chinese — see the app's CloudWatch logs for `modelId like "deepseek"`) drove individual rulings as high as 4,600 output tokens, well above the ~900–1,300 token norm, since R1's chain-of-thought reasoning scales with how many chain links and interactions it has to work through.
+
 ---
 
 ## Deployment
@@ -167,23 +189,33 @@ For full AWS infrastructure setup — IAM user, Bedrock model access, and deploy
 ```
 src/
 ├── app/
-│   ├── api/judge/        # POST /api/judge — two-stage ruling pipeline
-│   ├── calculator/       # Opening Hand Calculator page
-│   ├── judge/            # Judge ruling page
-│   └── page.tsx          # Landing page
+│   ├── api/
+│   │   ├── judge/            # POST /api/judge — non-streaming ruling endpoint (dev/dummy mode)
+│   │   └── judge-stream/     # POST /api/judge-stream — SSE streaming endpoint used by the live UI
+│   ├── calculator/           # Opening Hand Calculator page
+│   ├── judge/                # Judge ruling page
+│   ├── sitemap.xml/          # Dynamic sitemap route
+│   └── page.tsx              # Landing page
 ├── components/
-│   ├── AnimatedResponse  # Streams ruling text character-by-character
-│   ├── HandCalculator    # Hypergeometric probability UI (Recharts, client-only)
-│   ├── JudgeContent      # Reads ?q= param, calls /api/judge, renders response
-│   ├── QueryForm         # Shared ruling input form
-│   └── ThemeToggle       # Dark/light mode switch
+│   ├── AnimatedResponse      # Renders streamed ruling tokens as they arrive over SSE
+│   ├── HandCalculator        # Hypergeometric probability UI (Recharts, client-only)
+│   ├── HomeQueryForm         # Landing-page query form; navigates to /judge?q=... on submit
+│   ├── JudgeContent          # Reads ?q= param, opens the SSE connection to /api/judge-stream, renders response
+│   ├── MillenniumBackground  # Decorative rotating Millennium Item background art
+│   ├── QueryForm             # Shared ruling input form (client-side submit cooldown only — see note below)
+│   ├── StageIndicator        # Shows pipeline stage progress (parse/extract/fetch/reason/generate) while streaming
+│   ├── ThemeProviderWrapper  # next-themes provider wrapper (system/dark/light)
+│   └── ThemeToggle           # Dark/light mode switch
 └── lib/
-    ├── ai.ts             # Bedrock client, two-stage pipeline, payload/response helpers
-    ├── constants.ts      # System prompts (v0–v2), card extraction prompt, canned responses
-    ├── util.ts           # Model detection, input sanitisation, profanity filter
-    ├── ygoprodeck.ts     # YGOPRODeck API client (card text fetcher)
-    └── theme.ts          # Theme utilities
+    ├── ai.ts                 # Bedrock client, two-stage pipeline — getJudgeRuling (non-streaming) + streamJudgeRuling (SSE)
+    ├── constants.ts          # System prompts (v0–v1_3_1), card extraction prompt, canned responses
+    ├── renderWithBold.tsx    # Renders **bold** markdown segments as JSX in ruling text
+    ├── theme.ts              # Theme utilities
+    ├── util.ts               # Model detection, input sanitisation, profanity filter
+    └── ygoprodeck.ts         # YGOPRODeck API client (card text fetcher)
 ```
+
+> **Note:** `QueryForm`'s submit cooldown (`RATE_LIMIT_MS`) is a client-side, in-memory guard only — it prevents rapid double-submits from the same browser tab but is not enforced by either API route. Anyone calling `/api/judge-stream` or `/api/judge` directly bypasses it entirely.
 
 ---
 
