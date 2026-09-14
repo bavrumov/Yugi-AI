@@ -191,7 +191,7 @@ Both `/api/judge` and `/api/judge-stream` enforce a server-side, IP-based slidin
 To enable it:
 
 1. In the Vercel dashboard, add the **Upstash Redis** integration (Storage tab → Create Database → Upstash → Redis) and connect it to this project.
-2. This injects `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` automatically — no manual env var entry needed. Leave the custom prefix blank; `Redis.fromEnv()` looks for those exact names.
+2. This injects `KV_REST_API_URL` and `KV_REST_API_TOKEN` automatically (Vercel's legacy "Vercel KV" naming, still used by default for Marketplace Upstash Redis) — no manual env var entry needed. Leave the custom prefix blank; `src/lib/ratelimit.ts` reads those exact names (with a fallback to `UPSTASH_REDIS_REST_URL`/`TOKEN` for a raw Upstash account not provisioned through Vercel).
 3. For local development, check the **Development** environment box when connecting the integration (this disables the "Sensitive" flag on the token, since sensitive vars can't be pulled to a local `.env` file), then run `vercel env pull .env.local`.
 
 If these env vars aren't set, rate limiting **fails open** (requests are allowed, a warning is logged) rather than breaking the app — so it's safe to deploy before the integration is connected, but the limiter won't actually do anything until it is.

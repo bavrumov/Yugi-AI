@@ -1,10 +1,16 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-// Requires UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN (set automatically
-// when the Upstash Redis integration is connected via the Vercel Marketplace).
-const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  ? Redis.fromEnv()
+// Vercel's Upstash Redis Marketplace integration injects KV_REST_API_URL /
+// KV_REST_API_TOKEN by default (legacy "Vercel KV" naming), not
+// UPSTASH_REDIS_REST_URL/TOKEN as @upstash/redis's own docs suggest — Redis.fromEnv()
+// looks for the latter and would silently find nothing. Fall back to the
+// UPSTASH_-prefixed names too, in case a raw Upstash account is wired in directly.
+const restUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+const restToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+const redis = restUrl && restToken
+  ? new Redis({ url: restUrl, token: restToken })
   : null;
 
 const judgeRatelimit = redis
@@ -24,7 +30,7 @@ export function getClientIp(request: Request): string {
 // without Upstash env vars still works. Logs once per miss so the gap is visible.
 export async function checkRateLimit(ip: string): Promise<{ success: boolean; remaining: number }> {
   if (!judgeRatelimit) {
-    console.warn("Rate limiting disabled: UPSTASH_REDIS_REST_URL/TOKEN not set");
+    console.warn("Rate limiting disabled: KV_REST_API_URL/TOKEN (or UPSTASH_REDIS_REST_URL/TOKEN) not set");
     return { success: true, remaining: Infinity };
   }
 
